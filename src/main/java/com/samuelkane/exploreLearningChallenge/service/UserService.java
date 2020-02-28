@@ -1,7 +1,7 @@
-package com.samuelkane.exploreLearningChallenge;
+package com.samuelkane.exploreLearningChallenge.service;
 
 import com.samuelkane.exploreLearningChallenge.domain.User;
-import com.samuelkane.exploreLearningChallenge.domain.UsersRepository;
+import com.samuelkane.exploreLearningChallenge.domain.UserRepository;
 import com.samuelkane.exploreLearningChallenge.exception.UserAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -14,20 +14,16 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
-public class UsersService {
-
-    private final UsersRepository usersRepository;
+public class UserService {
 
     @Autowired
-    public UsersService(final UsersRepository usersRepository){
-        this.usersRepository = usersRepository;
-    }
+    private UserRepository userRepository;
 
     public void addUser(String json) throws JSONException, UserAlreadyExistsException {
         JSONObject decodedJson = new JSONObject(json);
         User user = new User();
-      user.setFirstName(decodedJson.getString("firstname"));
-      user.setLastName(decodedJson.getString("lastname"));
+        user.setFirstName(decodedJson.getString("firstname"));
+        user.setLastName(decodedJson.getString("lastname"));
 //TODO: Get this working, the problem with all of this is h2 integration
 //      I can't get it to behave the same as at New Engen...
 //        if(usersRepository.existsByFirstNameAndLastName(
@@ -35,21 +31,17 @@ public class UsersService {
 //        ){
 //            throw new UserAlreadyExistsException;
 //        }
-        usersRepository.save(user);
+        userRepository.save(user);
     }
 
-    public User getUser(Long id) {
-        return usersRepository.findById(id).get();
-    }
+    public User getUser(Long id) { return userRepository.findById(id).get(); }
 
     public List<User> getAllUsers() {
         return StreamSupport
-                .stream(usersRepository.findAll().spliterator(), false)
+                .stream(userRepository.findAll().spliterator(), false)
                 .sorted(Comparator.comparing(User::getLastName))
                 .collect(Collectors.toList());
     }
 
-    public void deleteUser(Long id) {
-        usersRepository.deleteById(id);
-    }
+    public void deleteUser(Long id) { userRepository.deleteById(id); }
 }
