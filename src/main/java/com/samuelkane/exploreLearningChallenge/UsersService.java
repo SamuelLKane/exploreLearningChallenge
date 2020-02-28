@@ -1,7 +1,7 @@
 package com.samuelkane.exploreLearningChallenge;
 
-import com.samuelkane.exploreLearningChallenge.db.User;
-import com.samuelkane.exploreLearningChallenge.db.UsersRepository;
+import com.samuelkane.exploreLearningChallenge.domain.User;
+import com.samuelkane.exploreLearningChallenge.domain.UsersRepository;
 import com.samuelkane.exploreLearningChallenge.exception.UserAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+@Service
 public class UsersService {
 
     private final UsersRepository usersRepository;

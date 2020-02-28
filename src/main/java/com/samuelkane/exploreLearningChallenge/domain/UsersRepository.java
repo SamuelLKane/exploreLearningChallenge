@@ -1,4 +1,4 @@
-package com.samuelkane.exploreLearningChallenge.db;
+package com.samuelkane.exploreLearningChallenge.domain;
 
 import org.springframework.data.repository.CrudRepository;
 
