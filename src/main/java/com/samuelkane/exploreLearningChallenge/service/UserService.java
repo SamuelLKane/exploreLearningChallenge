@@ -24,13 +24,11 @@ public class UserService {
         User user = new User();
         user.setFirstName(decodedJson.getString("firstname"));
         user.setLastName(decodedJson.getString("lastname"));
-//TODO: Get this working, the problem with all of this is h2 integration
-//      I can't get it to behave the same as at New Engen...
-//        if(usersRepository.existsByFirstNameAndLastName(
-//                user.getFirstName(),user.getLastName())
-//        ){
-//            throw new UserAlreadyExistsException;
-//        }
+        if(userRepository.existsByFirstNameAndLastName(
+                user.getFirstName(),user.getLastName())
+        ){
+            throw new UserAlreadyExistsException();
+        }
         userRepository.save(user);
     }
 
