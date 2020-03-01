@@ -162,10 +162,71 @@ public class UserControllerTest {
     }
 
     // get - specific user - success
+    @Test
+    @WithMockUser("ADMIN")
+    public void getSpecificUserSuccess()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/1")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}");
+    }
+
     // get - specific user - invalid ID (-1,0,4)
+    @Test
+    @WithMockUser("ADMIN")
+    public void getSpecificUserInvalidId()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/4")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(404);
+    }
+
     // get - specific user - admin role
+    @Test
+    @WithMockUser("ADMIN")
+    public void getSpecificUserAdminRole()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/1")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}");
+    }
+
     // get - specific user - user role
+    @Test
+    @WithMockUser("USER")
+    public void getSpecificUserUserRole()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/1")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}");
+    }
+
     // get - specific user - no auth
+    @Test
+    @WithAnonymousUser
+    public void getSpecificUserNoAuth()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/1")
+        ).andReturn();
+
+        // TODO: Figure out why Auth isn't a blocker? and update code to 400
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+    }
 
     // get - all - success
     // get - all - admin role
