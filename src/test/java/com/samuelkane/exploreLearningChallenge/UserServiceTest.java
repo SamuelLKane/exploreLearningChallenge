@@ -1,21 +1,21 @@
 package com.samuelkane.exploreLearningChallenge;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.samuelkane.exploreLearningChallenge.domain.User;
 import com.samuelkane.exploreLearningChallenge.domain.UserRepository;
 import com.samuelkane.exploreLearningChallenge.exception.UserAlreadyExistsException;
 import com.samuelkane.exploreLearningChallenge.service.UserService;
-import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ExploreLearningChallengeApplication.class)
