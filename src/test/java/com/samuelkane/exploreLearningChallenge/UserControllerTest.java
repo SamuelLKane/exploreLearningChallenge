@@ -69,7 +69,7 @@ public class UserControllerTest {
     // post - success
     @Test
     @WithMockUser("ADMIN")
-    public void postSuccess()throws Exception {
+    public void postSuccess() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
                 "\"firstname\": \"Jessica\"," +
@@ -88,7 +88,7 @@ public class UserControllerTest {
     // post - bad payload
     @Test
     @WithMockUser("ADMIN")
-    public void postBadPayload()throws Exception {
+    public void postBadPayload() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
                 "\"firstname\": \"Jessica\"," +
@@ -106,7 +106,7 @@ public class UserControllerTest {
     // post - name conflict
     @Test
     @WithMockUser("ADMIN")
-    public void postNameConflict()throws Exception {
+    public void postNameConflict() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
                 "\"firstname\": \"Samuel\"," +
@@ -125,7 +125,7 @@ public class UserControllerTest {
     // post - invalid role
     @Test
     @WithMockUser("USER")
-    public void postInvalidRole()throws Exception {
+    public void postInvalidRole() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
                 "\"firstname\": \"Samuel\"," +
@@ -144,7 +144,7 @@ public class UserControllerTest {
     // post - no auth
     @Test
     @WithAnonymousUser
-    public void postNoAuth()throws Exception {
+    public void postNoAuth() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
                 "\"firstname\": \"Samuel\"," +
@@ -164,7 +164,7 @@ public class UserControllerTest {
     // get - specific user - success
     @Test
     @WithMockUser("ADMIN")
-    public void getSpecificUserSuccess()throws Exception {
+    public void getSpecificUserSuccess() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
         ).andReturn();
@@ -178,7 +178,7 @@ public class UserControllerTest {
     // get - specific user - invalid ID (-1,0,4)
     @Test
     @WithMockUser("ADMIN")
-    public void getSpecificUserInvalidId()throws Exception {
+    public void getSpecificUserInvalidId() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/4")
         ).andReturn();
@@ -190,7 +190,7 @@ public class UserControllerTest {
     // get - specific user - admin role
     @Test
     @WithMockUser("ADMIN")
-    public void getSpecificUserAdminRole()throws Exception {
+    public void getSpecificUserAdminRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
         ).andReturn();
@@ -204,7 +204,7 @@ public class UserControllerTest {
     // get - specific user - user role
     @Test
     @WithMockUser("USER")
-    public void getSpecificUserUserRole()throws Exception {
+    public void getSpecificUserUserRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
         ).andReturn();
@@ -218,7 +218,7 @@ public class UserControllerTest {
     // get - specific user - no auth
     @Test
     @WithAnonymousUser
-    public void getSpecificUserNoAuth()throws Exception {
+    public void getSpecificUserNoAuth() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
         ).andReturn();
@@ -231,14 +231,13 @@ public class UserControllerTest {
     // get - all - success
     @Test
     @WithMockUser("ADMIN")
-    public void getAllSuccess()throws Exception {
+    public void getAllSuccess() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
         ).andReturn();
 
         assertThat(result.getResponse().getStatus())
                 .isEqualTo(200);
-        String content = result.getResponse().getContentAsString();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo("[" +
                         "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
@@ -250,14 +249,13 @@ public class UserControllerTest {
     // get - all - admin role
     @Test
     @WithMockUser("ADMIN")
-    public void getAllAdminRole()throws Exception {
+    public void getAllAdminRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
         ).andReturn();
 
         assertThat(result.getResponse().getStatus())
                 .isEqualTo(200);
-        String content = result.getResponse().getContentAsString();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo("[" +
                         "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
@@ -269,14 +267,13 @@ public class UserControllerTest {
     // get - all - user role
     @Test
     @WithMockUser("USER")
-    public void getAllUserRole()throws Exception {
+    public void getAllUserRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
         ).andReturn();
 
         assertThat(result.getResponse().getStatus())
                 .isEqualTo(200);
-        String content = result.getResponse().getContentAsString();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo("[" +
                         "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
@@ -288,7 +285,7 @@ public class UserControllerTest {
     // get - all - no auth
     @Test
     @WithAnonymousUser
-    public void getAllNoAuth()throws Exception {
+    public void getAllNoAuth() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
         ).andReturn();
@@ -296,7 +293,6 @@ public class UserControllerTest {
         // TODO: Another one, this may be something I can't work around if spring security isn't involved
         assertThat(result.getResponse().getStatus())
                 .isEqualTo(200);
-        String content = result.getResponse().getContentAsString();
         assertThat(result.getResponse().getContentAsString())
                 .isEqualTo("[" +
                         "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
@@ -306,8 +302,65 @@ public class UserControllerTest {
     }
 
     // delete - success
+    @Test
+    @WithMockUser("ADMIN")
+    public void deleteSuccess() throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/1")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(202);
+    }
+
     // delete - invalid ID (-1,0,4)
+    @Test
+    @WithMockUser("ADMIN")
+    public void deleteInvalidId() throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/4")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(404);
+    }
+
     // delete - admin role
+    @Test
+    @WithMockUser("ADMIN")
+    public void deleteAdminRole() throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/1")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(202);
+    }
+
     // delete - user role
+    @Test
+    @WithMockUser("USER")
+    public void deleteUserRole() throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/1")
+        ).andReturn();
+
+        // TODO: Security...
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(202);
+    }
+
     // delete - no auth
+    @Test
+    @WithAnonymousUser
+    public void deleteNoAuth() throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/1")
+        ).andReturn();
+
+        // TODO: Security, again...
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(202);
+    }
+
 }
