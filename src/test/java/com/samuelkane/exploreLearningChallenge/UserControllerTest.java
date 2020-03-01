@@ -1,41 +1,29 @@
 package com.samuelkane.exploreLearningChallenge;
 
-import com.samuelkane.exploreLearningChallenge.api.UserController;
-import com.samuelkane.exploreLearningChallenge.domain.User;
-import com.samuelkane.exploreLearningChallenge.domain.UserRepository;
-import com.samuelkane.exploreLearningChallenge.service.UserService;
-import io.restassured.module.mockmvc.response.MockMvcResponse;
-import io.restassured.module.mockmvc.specification.MockMvcRequestSpecification;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.MockMvcBuilder;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = ExploreLearningChallengeApplication.class)
 @WebAppConfiguration
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserControllerTest {
 
     private MockMvc mockMvc;
@@ -46,24 +34,6 @@ public class UserControllerTest {
     @Before
     public void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-    }
-
-//    private MockMvcRequestSpecification mockMvcSpec;
-//
-//    @MockBean
-//    private UserRepository userRepository;
-//
-//    @Before
-//    public void setup() {
-//        User user1 = new User(1L, "Samuel","Kane");
-//        User user2 = new User(1L, "Robin","Macklin");
-//        User user3 = new User(1L, "Carlos","Vizcaino");
-//        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
-//    }
-
-    @Test
-    public void test(){
-        assertThat(true).isTrue();
     }
 
     // post - success
@@ -181,6 +151,20 @@ public class UserControllerTest {
     public void getSpecificUserInvalidId() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/4")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(404);
+
+        result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/0")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(404);
+
+        result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users/-1")
         ).andReturn();
 
         assertThat(result.getResponse().getStatus())
@@ -319,6 +303,20 @@ public class UserControllerTest {
     public void deleteInvalidId() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/4")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(404);
+
+        result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/0")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(404);
+
+        result = mockMvc.perform(
+                MockMvcRequestBuilders.delete("/users/-1")
         ).andReturn();
 
         assertThat(result.getResponse().getStatus())
