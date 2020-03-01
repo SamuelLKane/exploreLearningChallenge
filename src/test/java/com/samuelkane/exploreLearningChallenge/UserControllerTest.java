@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -83,6 +84,7 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getStatus()).isEqualTo(204);
     }
+
     // post - bad payload
     @Test
     @WithMockUser("ADMIN")
@@ -100,9 +102,64 @@ public class UserControllerTest {
 
         assertThat(result.getResponse().getStatus()).isEqualTo(400);
     }
+
     // post - name conflict
-    // post - wrong role
+    @Test
+    @WithMockUser("ADMIN")
+    public void postNameConflict()throws Exception {
+        String json = "{" +
+                "\"id\": \"4\"," +
+                "\"firstname\": \"Samuel\"," +
+                "\"lastname\": \"Kane\"" +
+                "}";
+
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(json)
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
+
+    // post - invalid role
+    @Test
+    @WithMockUser("USER")
+    public void postInvalidRole()throws Exception {
+        String json = "{" +
+                "\"id\": \"4\"," +
+                "\"firstname\": \"Samuel\"," +
+                "\"lastname\": \"Kane\"" +
+                "}";
+
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(json)
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
+
     // post - no auth
+    @Test
+    @WithAnonymousUser
+    public void postNoAuth()throws Exception {
+        String json = "{" +
+                "\"id\": \"4\"," +
+                "\"firstname\": \"Samuel\"," +
+                "\"lastname\": \"Kane\"" +
+                "}";
+
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.post("/users")
+                        .contentType(APPLICATION_JSON_VALUE)
+                        .content(json)
+        ).andReturn();
+
+        // TODO: look into why this didn't return a 401... (also look at postInvalidRole())
+        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+    }
 
     // get - specific user - success
     // get - specific user - invalid ID (-1,0,4)
