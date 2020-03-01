@@ -1,7 +1,9 @@
 package com.samuelkane.exploreLearningChallenge.api;
 
+import com.samuelkane.exploreLearningChallenge.domain.User;
 import com.samuelkane.exploreLearningChallenge.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +28,14 @@ public class UserController {
              */
             return ResponseEntity.badRequest().body(e.getMessage());
         }
+        // return ResponseEntity.created("/users/{id}").build();
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping(path = "/users/{userId}")
     public ResponseEntity<?> getSpecificUser(@PathVariable("userId") Long userId) {
-        return ResponseEntity.ok(userService.getUser(userId));
+        User user = userService.getUser(userId);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
     }
 
     @GetMapping(path = "/users")
@@ -41,7 +45,11 @@ public class UserController {
 
     @DeleteMapping(path = "/users/{userId}")
     public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId){
-        userService.deleteUser(userId);
+        try {
+            userService.deleteUser(userId);
+        } catch (EmptyResultDataAccessException e){
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.accepted().build();
     }
 }
