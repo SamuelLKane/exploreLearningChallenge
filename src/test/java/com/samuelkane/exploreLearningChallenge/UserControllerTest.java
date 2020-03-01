@@ -229,9 +229,81 @@ public class UserControllerTest {
     }
 
     // get - all - success
+    @Test
+    @WithMockUser("ADMIN")
+    public void getAllSuccess()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        String content = result.getResponse().getContentAsString();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("[" +
+                        "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
+                        "{\"id\":2,\"firstName\":\"Robin\",\"lastName\":\"Macklin\"}," +
+                        "{\"id\":3,\"firstName\":\"Carlos\",\"lastName\":\"Vizcaino\"}" +
+                        "]");
+    }
+
     // get - all - admin role
+    @Test
+    @WithMockUser("ADMIN")
+    public void getAllAdminRole()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        String content = result.getResponse().getContentAsString();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("[" +
+                        "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
+                        "{\"id\":2,\"firstName\":\"Robin\",\"lastName\":\"Macklin\"}," +
+                        "{\"id\":3,\"firstName\":\"Carlos\",\"lastName\":\"Vizcaino\"}" +
+                        "]");
+    }
+
     // get - all - user role
+    @Test
+    @WithMockUser("USER")
+    public void getAllUserRole()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users")
+        ).andReturn();
+
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        String content = result.getResponse().getContentAsString();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("[" +
+                        "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
+                        "{\"id\":2,\"firstName\":\"Robin\",\"lastName\":\"Macklin\"}," +
+                        "{\"id\":3,\"firstName\":\"Carlos\",\"lastName\":\"Vizcaino\"}" +
+                        "]");
+    }
+
     // get - all - no auth
+    @Test
+    @WithAnonymousUser
+    public void getAllNoAuth()throws Exception {
+        MvcResult result = mockMvc.perform(
+                MockMvcRequestBuilders.get("/users")
+        ).andReturn();
+
+        // TODO: Another one, this may be something I can't work around if spring security isn't involved
+        assertThat(result.getResponse().getStatus())
+                .isEqualTo(200);
+        String content = result.getResponse().getContentAsString();
+        assertThat(result.getResponse().getContentAsString())
+                .isEqualTo("[" +
+                        "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
+                        "{\"id\":2,\"firstName\":\"Robin\",\"lastName\":\"Macklin\"}," +
+                        "{\"id\":3,\"firstName\":\"Carlos\",\"lastName\":\"Vizcaino\"}" +
+                        "]");
+    }
 
     // delete - success
     // delete - invalid ID (-1,0,4)
