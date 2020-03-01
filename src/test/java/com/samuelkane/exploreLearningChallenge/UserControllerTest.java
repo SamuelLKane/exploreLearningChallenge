@@ -8,8 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -18,10 +17,10 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@SpringBootTest(classes = ExploreLearningChallengeApplication.class)
-@WebAppConfiguration
+@RunWith(SpringRunner.class)
+@SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class UserControllerTest {
 
@@ -32,12 +31,15 @@ public class UserControllerTest {
 
     @Before
     public void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+        mockMvc = MockMvcBuilders
+                .webAppContextSetup(webApplicationContext)
+                .apply(springSecurity())
+                .build();
     }
 
     // post - success
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void postSuccess() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
@@ -56,7 +58,7 @@ public class UserControllerTest {
 
     // post - bad payload
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void postBadPayload() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
@@ -74,7 +76,7 @@ public class UserControllerTest {
 
     // post - name conflict
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void postNameConflict() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
@@ -93,7 +95,7 @@ public class UserControllerTest {
 
     // post - invalid role
     @Test
-    @WithMockUser("USER")
+    @WithMockUser(username = "user", password = "{noop}password")
     public void postInvalidRole() throws Exception {
         String json = "{" +
                 "\"id\": \"4\"," +
@@ -107,7 +109,7 @@ public class UserControllerTest {
                         .content(json)
         ).andReturn();
 
-        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+        assertThat(result.getResponse().getStatus()).isEqualTo(403);
     }
 
     // post - no auth
@@ -127,12 +129,12 @@ public class UserControllerTest {
         ).andReturn();
 
         // TODO: look into why this didn't return a 401... (also look at postInvalidRole())
-        assertThat(result.getResponse().getStatus()).isEqualTo(400);
+        assertThat(result.getResponse().getStatus()).isEqualTo(401);
     }
 
     // get - specific user - success
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void getSpecificUserSuccess() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
@@ -146,7 +148,7 @@ public class UserControllerTest {
 
     // get - specific user - invalid ID (-1,0,4)
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void getSpecificUserInvalidId() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/4")
@@ -172,7 +174,7 @@ public class UserControllerTest {
 
     // get - specific user - admin role
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void getSpecificUserAdminRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
@@ -186,7 +188,7 @@ public class UserControllerTest {
 
     // get - specific user - user role
     @Test
-    @WithMockUser("USER")
+    @WithMockUser(username = "user", password = "{noop}password")
     public void getSpecificUserUserRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users/1")
@@ -206,14 +208,13 @@ public class UserControllerTest {
                 MockMvcRequestBuilders.get("/users/1")
         ).andReturn();
 
-        // TODO: Figure out why Auth isn't a blocker? and update code to 400
         assertThat(result.getResponse().getStatus())
-                .isEqualTo(200);
+                .isEqualTo(401);
     }
 
     // get - all - success
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void getAllSuccess() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
@@ -231,7 +232,7 @@ public class UserControllerTest {
 
     // get - all - admin role
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void getAllAdminRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
@@ -249,7 +250,7 @@ public class UserControllerTest {
 
     // get - all - user role
     @Test
-    @WithMockUser("USER")
+    @WithMockUser(username = "user", password = "{noop}password")
     public void getAllUserRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.get("/users")
@@ -273,20 +274,13 @@ public class UserControllerTest {
                 MockMvcRequestBuilders.get("/users")
         ).andReturn();
 
-        // TODO: Another one, this may be something I can't work around if spring security isn't involved
         assertThat(result.getResponse().getStatus())
-                .isEqualTo(200);
-        assertThat(result.getResponse().getContentAsString())
-                .isEqualTo("[" +
-                        "{\"id\":1,\"firstName\":\"Samuel\",\"lastName\":\"Kane\"}," +
-                        "{\"id\":2,\"firstName\":\"Robin\",\"lastName\":\"Macklin\"}," +
-                        "{\"id\":3,\"firstName\":\"Carlos\",\"lastName\":\"Vizcaino\"}" +
-                        "]");
+                .isEqualTo(401);
     }
 
     // delete - success
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void deleteSuccess() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/1")
@@ -298,7 +292,7 @@ public class UserControllerTest {
 
     // delete - invalid ID (-1,0,4)
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void deleteInvalidId() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/4")
@@ -324,7 +318,7 @@ public class UserControllerTest {
 
     // delete - admin role
     @Test
-    @WithMockUser("ADMIN")
+    @WithMockUser(username = "admin", password = "{noop}password",roles = {"ADMIN"})
     public void deleteAdminRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/1")
@@ -336,15 +330,14 @@ public class UserControllerTest {
 
     // delete - user role
     @Test
-    @WithMockUser("USER")
+    @WithMockUser(username = "user", password = "{noop}password")
     public void deleteUserRole() throws Exception {
         MvcResult result = mockMvc.perform(
                 MockMvcRequestBuilders.delete("/users/1")
         ).andReturn();
 
-        // TODO: Security...
         assertThat(result.getResponse().getStatus())
-                .isEqualTo(202);
+                .isEqualTo(403);
     }
 
     // delete - no auth
@@ -355,9 +348,8 @@ public class UserControllerTest {
                 MockMvcRequestBuilders.delete("/users/1")
         ).andReturn();
 
-        // TODO: Security, again...
         assertThat(result.getResponse().getStatus())
-                .isEqualTo(202);
+                .isEqualTo(401);
     }
 
 }

@@ -14,8 +14,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/users").hasRole("ADMIN")
-                .antMatchers(HttpMethod.GET, "/users/**").hasRole("USER")
-                .antMatchers(HttpMethod.GET, "/users").hasRole("USER") // TODO: May be able to drop this
+                .antMatchers(HttpMethod.GET, "/users/**").hasAnyRole("USER,ADMIN")
+                .antMatchers(HttpMethod.GET, "/users").hasAnyRole("USER,ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/users/**").hasRole("ADMIN")
                 .and()
                 .csrf().disable()
@@ -27,6 +27,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
         auth.inMemoryAuthentication()
                 .withUser("user").password("{noop}password").roles("USER")
                 .and()
-                .withUser("admin").password("{noop}password").roles("USER","ADMIN");
+                .withUser("admin").password("{noop}password").roles("USER,ADMIN");
     }
 }
