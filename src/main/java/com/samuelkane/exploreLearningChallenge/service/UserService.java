@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,7 +33,13 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public User getUser(Long id) { return userRepository.findById(id).get(); }
+    public User getUser(Long id) {
+        try {
+            return userRepository.findById(id).get();
+        } catch (NoSuchElementException e){
+            return null;
+        }
+    }
 
     public List<User> getAllUsers() {
         return StreamSupport
